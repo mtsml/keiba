@@ -18,7 +18,7 @@ def main(word):
     db = Db()
     for race_id in race_id_list:
         print('race_id: ', race_id)
-        race_info = make_race_list(race_id)
+        race_info = make_race_info(race_id)
         print('race_info: ', race_info)
         db.insert_race(race_info)
         print('------------------------------------------')
@@ -38,12 +38,12 @@ def get_race_id_list(race_name):
 
     res.encoding = ENCODING
     soup = bs4(res.text, 'lxml')
-    race_id_list = filter_race_id_from_soup(soup)
+    race_id_list = make_race_id_from_soup(soup)
 
     return race_id_list
 
 
-def filter_race_id_from_soup(soup):
+def make_race_id_from_soup(soup):
     """
     soupからrace_idをすべて取り出す。
     """
@@ -59,7 +59,7 @@ def filter_race_id_from_soup(soup):
     return race_id_list
 
 
-def make_race_list(race_id):
+def make_race_info(race_id):
     url = f'https://db.netkeiba.com/race/{race_id}/'
     res = requests.get(url)
     soup = bs4(res.content, 'lxml')
