@@ -1,5 +1,5 @@
 CREATE TABLE race (
-    race_id         INTEGER     PRIMARY KEY,
+    race_id         BIGINT     PRIMARY KEY,
     weather         VARCHAR,
     distance        INTEGER,
     racecourse      VARCHAR,

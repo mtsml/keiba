@@ -1,6 +1,6 @@
 CREATE TABLE race_horse_map (
-    race_id         INTEGER     REFERENCES race(race_id),
-    horse_id        INTEGER,
+    race_id         BIGINT     REFERENCES race(race_id),
+    horse_id        BIGINT,
     odds            NUMERIC,
     umaban          INTEGER,
     wakuban         INTEGER,
