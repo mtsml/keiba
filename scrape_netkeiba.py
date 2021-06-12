@@ -37,7 +37,7 @@ def get_race_id_list(race_name):
     res = requests.post(SEARCH_URL, data=payload)
 
     res.encoding = ENCODING
-    soup = bs4(res.text, 'lxml');
+    soup = bs4(res.text, 'lxml')
     race_id_list = filter_race_id_from_soup(soup)
 
     return race_id_list
