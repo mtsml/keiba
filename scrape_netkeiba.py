@@ -7,8 +7,9 @@ from bs4 import BeautifulSoup
 SEARCH_URL = 'https://db.netkeiba.com/'
 ENCODING = 'EUC-JP'
 
-def main():
-    race_id_list = get_race_id_list('エプソムカップ')
+
+def main(word):
+    race_id_list = get_race_id_list(word)
     print(race_id_list)
     print(len(race_id_list))
     return
@@ -58,4 +59,5 @@ def insert_race_info(race_info):
     """
 
 if __name__ == "__main__":
-    main()
+    word = input('検索ワードを入力してください>')
+    main(word)
