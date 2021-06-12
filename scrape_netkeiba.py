@@ -19,8 +19,12 @@ def main(word):
     for race_id in race_id_list:
         print('race_id: ', race_id)
         race_info = make_race_info(race_id)
+        race_horse_map_info = make_race_horse_map_info(race_id)
         print('race_info: ', race_info)
+        print('race_horse_map_info: ', race_horse_map_info)
         db.insert_race(race_info)
+        if len(race_horse_map_info) > 0:
+            db.insert_race_horse_map(race_horse_map_info)
         print('------------------------------------------')
 
 
@@ -88,6 +92,39 @@ def make_race_info(race_id):
         'track_condition': track_condition
     }
     return race_info
+
+def make_race_horse_map_info(race_id):
+    url = f'https://db.netkeiba.com/race/{race_id}/'
+    res = requests.get(url)
+    soup = bs4(res.content, 'lxml')
+
+    race_horse_map_list = []
+    if soup.find('div', class_='Premium_Regist_Box'):
+        return race_horse_map_list
+
+    tr_list = soup.find('table', class_='race_table_01').find_all('tr')
+    for index, tr in enumerate(tr_list):
+        # リストの先頭はヘッダーのため処理しない
+        if index == 0: continue
+
+        td_list = tr.find_all('td')
+        race_horse_map = {
+            'race_id'       : int(race_id),
+            'horse_id'      : int(td_list[3].a.get('href').replace('/horse/', '').replace('/', '')),
+            'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
+            'umaban'        : int(td_list[2].string),
+            'wakuban'       : int(td_list[1].string),
+            'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
+            'jockey_id'     : int(td_list[6].a.get('href').replace('/jockey/', '').replace('/', '')),
+            'race_time'     : td_list[7].string if td_list[7].string != None else 'NULL',
+            'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
+            'agari'         : float(td_list[11].string) if td_list[11].string != None else 'NULL',
+            'passing_order' : td_list[10].string
+        }
+
+        race_horse_map_list.append(race_horse_map)
+    
+    return race_horse_map_list
 
 
 def trim(s):
