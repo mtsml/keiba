@@ -27,7 +27,6 @@ def main(word):
         db.insert_race(race_info)
         if len(race_horse_map_info) > 0:
             db.insert_race_horse_map(race_horse_map_info)
-        return
         print('------------------------------------------')
 
 
@@ -127,7 +126,7 @@ def make_race_horse_map_info(race_id):
             'wakuban'       : int(td_list[1].string),
             'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
             'jockey_id'     : int(td_list[6].a.get('href').replace('/jockey/', '').replace('/', '')),
-            'jockey_weight' : int(td_list[5].string) if td_list[5].string != None else 'NULL',
+            'jockey_weight' : float(td_list[5].string) if td_list[5].string != None else 'NULL',
             'race_time'     : td_list[7].string if td_list[7].string != None else 'NULL',
             'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
             'agari'         : float(td_list[11].string) if td_list[11].string != None else 'NULL',

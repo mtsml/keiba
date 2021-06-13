@@ -9,7 +9,7 @@ CREATE TABLE race_horse_map_backup (
     wakuban         INTEGER,
     chakujun        INTEGER,
     jockey_id       INTEGER,
-    jockey_weight   INTEGER,
+    jockey_weight   NUMERIC,
     race_time       TIME,
     weight          SMALLINT,
     agari           NUMERIC,

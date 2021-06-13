@@ -36,7 +36,7 @@ class Db:
         出走馬の情報をrace_horse_mapテーブルに一括で格納する。
         形式：INSERT INTO race_horse_map VALUES(),(),();
         """
-        sql = 'INSERT INTO public.race_horse_map(race_id, horse_id, sex, age, odds, umaban, wakuban, chakujun, jockey_id, jockey_weight, race_time, weight, agari, passing_order, prize) VALUES '
+        sql = 'INSERT INTO public.race_horse_map(race_id, horse_id, age, sex, odds, umaban, wakuban, chakujun, jockey_id, jockey_weight, race_time, weight, agari, passing_order, prize) VALUES '
         for index, race_horse_map in enumerate(race_horse_map_list):
             if index != 0:
                 sql += ','
