@@ -21,6 +21,7 @@ def main(word):
     for race_id in race_id_list:
         print('race_id: ', race_id)
         db.delete_race(race_id)
+
         race_info = make_race_info(race_id)
         race_horse_map_info = make_race_horse_map_info(race_id)
         print('race_info: ', race_info)
@@ -29,9 +30,24 @@ def main(word):
         if len(race_horse_map_info) > 0:
             db.insert_race_horse_map(race_horse_map_info)
             for i in race_horse_map_info:
-                horse_info = make_horse_info(i['horse_id'])
-                print(horse_info)
+                horse_id = i['horse_id']
+                horse_info, past_race_id_list = make_horse_info(horse_id)
+                print('  horse_info: ', horse_info)
                 db.insert_horse(horse_info)
+
+                # 過去の出走データ処理
+                if len(past_race_id_list) > 0:
+                    print('  past_race_id_list: ', past_race_id_list)
+                    for past_race_id in past_race_id_list:
+                        past_race_info = make_race_info(race_id)
+                        past_race_horse_map_info = make_race_horse_map_info(race_id)
+                        print('    past_race_info: ', past_race_info)
+                        print('    past_race_horse_map_info: ', past_race_horse_map_info)
+                        db.insert_race(past_race_info)
+                        if len(past_race_horse_map_info) > 0:
+                            db.insert_race_horse_map(past_race_horse_map_info)
+                            # これ以上進む場合は再帰に置き換えること
+
         print('------------------------------------------')
 
 
@@ -179,14 +195,21 @@ def make_horse_info(horse_id):
         }
     }
 
+    # 馬のprofileを取得
     tr_list = soup.find('table', class_='db_prof_table').find_all('tr')
     for tr in tr_list:
         th = tr.find('th').string
         td = tr.find('td')
         if th in horse_column_map.keys():
-            horse_map[horse_column_map[th]['key']] = horse_column_map[th]['val'](td)
-    
-    return horse_map
+            horse_map[horse_column_map[th]['key']] = horse_column_map[th]['val'](td)    
+
+    # 過去の出走race_idをすべて取得
+    past_race_id_list = []
+    tr_list = soup.find('table', class_='db_h_race_results').find('tbody').find_all('tr')
+    for tr in tr_list:
+        past_race_id_list.append(int(tr.find_all('td')[4].a.get('href').replace('/race/', '').replace('/', '')))
+
+    return horse_map, past_race_id_list
 
 
 def trim(s):
@@ -224,5 +247,8 @@ def get_soup_from_url(url, method, payload):
 
 
 if __name__ == "__main__":
-    word = input('検索ワードを入力してください>')
-    main(word)
+    # word = input('検索ワードを入力してください>')
+    # main(word)
+    horse_info, past_race_id_list = make_horse_info(2016104772)
+    print(horse_info)
+    print(past_race_id_list)
