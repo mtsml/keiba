@@ -155,7 +155,7 @@ def make_race_horse_map_info(race_id):
             'prize'         : int(re.sub('\..*$', '', td_list[20].string).replace(',', ''))*10000 if td_list[20].string != None else 'NULL'
         }
         race_horse_map_list.append(race_horse_map)
-    
+
     return race_horse_map_list
 
 
@@ -201,7 +201,12 @@ def make_horse_info(horse_id):
         th = tr.find('th').string
         td = tr.find('td')
         if th in horse_column_map.keys():
-            horse_map[horse_column_map[th]['key']] = horse_column_map[th]['val'](td)    
+            horse_map[horse_column_map[th]['key']] = horse_column_map[th]['val'](td)
+
+    # 血統情報を取得　
+    tr_list = soup.find('table', class_='blood_table').find_all('tr')
+    horse_map['father_horse_id'] = int(tr_list[0].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', ''))
+    horse_map['mother_horse_id'] = int(tr_list[2].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', ''))
 
     # 過去の出走race_idをすべて取得
     past_race_id_list = []
@@ -247,8 +252,5 @@ def get_soup_from_url(url, method, payload):
 
 
 if __name__ == "__main__":
-    # word = input('検索ワードを入力してください>')
-    # main(word)
-    horse_info, past_race_id_list = make_horse_info(2016104772)
-    print(horse_info)
-    print(past_race_id_list)
+    word = input('検索ワードを入力してください>')
+    main(word)

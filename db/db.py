@@ -36,7 +36,7 @@ class Db:
         """
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute('INSERT INTO race(race_id, race_date, weather, distance, racecourse, race_condition, track_type, track_condition, mawari) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                cur.execute('INSERT INTO race(race_id, race_date, weather, distance, racecourse, race_condition, track_type, track_condition, mawari) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)  ON CONFLICT (race_id) DO NOTHING',
                    (race_info['race_id'], race_info['race_date'], race_info['weather'], race_info['distance'], race_info['racecourse'], race_info['race_condition'], race_info['track_type'], race_info['track_condition'], race_info['mawari']))
             conn.commit()
 
@@ -64,6 +64,6 @@ class Db:
         """
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("INSERT INTO horse(horse_id, birthday, trainer_id, owner_id, breeder_id, birthplace, selling_price) VALUES(%s, %s, %s, %s, %s, %s, %s) ON CONFLICT (horse_id) DO NOTHING",
-                   (horse_info['horse_id'], horse_info['birthday'], horse_info['trainer_id'], horse_info['owner_id'], horse_info['breeder_id'], horse_info['birthplace'], horse_info['selling_price']))
+                cur.execute("INSERT INTO horse(horse_id, birthday, trainer_id, owner_id, breeder_id, birthplace, selling_price, father_horse_id, mother_horse_id) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (horse_id) DO NOTHING",
+                   (horse_info['horse_id'], horse_info['birthday'], horse_info['trainer_id'], horse_info['owner_id'], horse_info['breeder_id'], horse_info['birthplace'], horse_info['selling_price'], horse_info['father_horse_id'], horse_info['mother_horse_id']))
             conn.commit()

@@ -6,5 +6,7 @@ CREATE TABLE horse (
     owner_id        VARCHAR,
     breeder_id      VARCHAR,
     birthplace      VARCHAR,
-    selling_price   INTEGER
+    selling_price   INTEGER,
+    mother_horse_id BIGINT,
+    father_horse_id BIGINT
 );
