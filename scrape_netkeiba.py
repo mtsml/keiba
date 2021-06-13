@@ -25,6 +25,7 @@ def main(word):
         db.insert_race(race_info)
         if len(race_horse_map_info) > 0:
             db.insert_race_horse_map(race_horse_map_info)
+        return
         print('------------------------------------------')
 
 
@@ -80,12 +81,14 @@ def make_race_info(race_id):
     track_type, track_condition = map(trim, race_info[2].split(':'))
 
     element = soup.find('p', attrs={ 'class': 'smalltxt' })
-    race_basic_info = ((element.string).split())[1:3]
-    race_condition = race_basic_info[1]
-    racecourse = re.findall('回(.*)\d+日', race_basic_info[0])[0]
+    race_basic_info = ((element.string).split())[0:3]
+    race_date = to_date(race_basic_info[0])
+    race_condition = race_basic_info[2]
+    racecourse = re.findall('回(.*)\d+日', race_basic_info[1])[0]
 
     race_info = {
         'race_id': int(race_id),
+        'race_date': race_date,
         'weather': weather,
         'distance': int(distance),
         'racecourse': racecourse,
@@ -139,6 +142,15 @@ def trim(s):
     文字列の前後の空白を削除する。
     """
     return str(s).strip()
+
+
+def to_date(s):
+    """
+    日本語表記の日付をISOの拡張形式に変換する。
+    変換前：YYYY年MM月DD日
+    返還後：YYYY-MM-DD
+    """
+    return trim(s).replace('年','-').replace('月','-').replace('日','')
 
 
 if __name__ == "__main__":
