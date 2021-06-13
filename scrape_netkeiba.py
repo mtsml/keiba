@@ -64,6 +64,9 @@ def make_race_id_from_soup(soup):
 
 
 def make_race_info(race_id):
+    """
+    netkeibaからrace_idを元にhtmlを取得し、必要なレース情報を抽出して返却する。
+    """
     url = f'https://db.netkeiba.com/race/{race_id}/'
     res = requests.get(url)
     soup = bs4(res.content, 'lxml')
@@ -93,13 +96,18 @@ def make_race_info(race_id):
     }
     return race_info
 
+
 def make_race_horse_map_info(race_id):
+    """
+    netkeibaからrace_idを元にhtmlを取得し、必要な出走馬の情報を抽出して返却する。
+    """
     url = f'https://db.netkeiba.com/race/{race_id}/'
     res = requests.get(url)
     soup = bs4(res.content, 'lxml')
 
     race_horse_map_list = []
     if soup.find('div', class_='Premium_Regist_Box'):
+        # プレミアム会員登録が必要な場合はデータを取得せずに返却する
         return race_horse_map_list
 
     tr_list = soup.find('table', class_='race_table_01').find_all('tr')
@@ -121,7 +129,6 @@ def make_race_horse_map_info(race_id):
             'agari'         : float(td_list[11].string) if td_list[11].string != None else 'NULL',
             'passing_order' : td_list[10].string
         }
-
         race_horse_map_list.append(race_horse_map)
     
     return race_horse_map_list
