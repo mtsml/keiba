@@ -139,7 +139,7 @@ def make_race_horse_map_info(race_id):
         td_list = tr.find_all('td')
         race_horse_map = {
             'race_id'       : int(race_id),
-            'horse_id'      : int(td_list[3].a.get('href').replace('/horse/', '').replace('/', '')),
+            'horse_id'      : td_list[3].a.get('href').replace('/horse/', '').replace('/', ''),
             'sex'           : td_list[4].string[0],
             'age'           : int(td_list[4].string[1]),
             'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
@@ -164,7 +164,7 @@ def make_horse_info(horse_id):
     soup = get_soup_from_url(url, 'GET', None)
 
     horse_map = {
-        'horse_id' : int(horse_id),
+        'horse_id' : horse_id,
         'horse_name': soup.find('div', class_='horse_title').h1.string.strip()
     }
 
@@ -205,8 +205,8 @@ def make_horse_info(horse_id):
 
     # 血統情報を取得　
     tr_list = soup.find('table', class_='blood_table').find_all('tr')
-    horse_map['father_horse_id'] = int(tr_list[0].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', ''))
-    horse_map['mother_horse_id'] = int(tr_list[2].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', ''))
+    horse_map['father_horse_id'] = tr_list[0].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', '')
+    horse_map['mother_horse_id'] = tr_list[2].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', '')
 
     # 過去の出走race_idをすべて取得
     past_race_id_list = []

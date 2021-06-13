@@ -1,5 +1,5 @@
 CREATE TABLE horse (
-    horse_id        BIGINT     PRIMARY KEY,
+    horse_id        VARCHAR     PRIMARY KEY,
     horse_name      VARCHAR,
     birthday        DATE,
     trainer_id      VARCHAR,
@@ -7,6 +7,6 @@ CREATE TABLE horse (
     breeder_id      VARCHAR,
     birthplace      VARCHAR,
     selling_price   INTEGER,
-    mother_horse_id BIGINT,
-    father_horse_id BIGINT
+    mother_horse_id VARCHAR,
+    father_horse_id VARCHAR
 );

@@ -51,7 +51,7 @@ class Db:
                 sql += ','
             # race_timeは文字列のためNULLでない場合は「'」を付与する
             race_time_tmp = "'" if race_horse_map['race_time'] != 'NULL' else ''
-            sql += f"({race_horse_map['race_id']}, {race_horse_map['horse_id']}, {race_horse_map['age']}, '{race_horse_map['sex']}', {race_horse_map['odds']}, {race_horse_map['umaban']}, {race_horse_map['wakuban']}, {race_horse_map['chakujun']}, '{race_horse_map['jockey_id']}', {race_horse_map['jockey_weight']}, {race_time_tmp}{race_horse_map['race_time']}{race_time_tmp}, {race_horse_map['weight']}, {race_horse_map['agari']}, '{race_horse_map['passing_order']}', {race_horse_map['prize']})"
+            sql += f"({race_horse_map['race_id']}, '{race_horse_map['horse_id']}', {race_horse_map['age']}, '{race_horse_map['sex']}', {race_horse_map['odds']}, {race_horse_map['umaban']}, {race_horse_map['wakuban']}, {race_horse_map['chakujun']}, '{race_horse_map['jockey_id']}', {race_horse_map['jockey_weight']}, {race_time_tmp}{race_horse_map['race_time']}{race_time_tmp}, {race_horse_map['weight']}, {race_horse_map['agari']}, '{race_horse_map['passing_order']}', {race_horse_map['prize']})"
         sql += '  ON CONFLICT (race_id, horse_id) DO NOTHING'
         with self.get_connection() as conn:
             with conn.cursor() as cur:
