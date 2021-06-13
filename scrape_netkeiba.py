@@ -1,5 +1,6 @@
 import urllib.parse
 import re
+import time
 
 import requests
 from bs4 import BeautifulSoup as bs4
@@ -9,6 +10,7 @@ from db.db import Db
 
 SEARCH_URL = 'https://db.netkeiba.com/'
 ENCODING = 'EUC-JP'
+WAIT_SECOND = 1
 
 
 def main(word):
@@ -39,10 +41,8 @@ def get_race_id_list(race_name):
         'list': '100',
         'word': word
     }
-    res = requests.post(SEARCH_URL, data=payload)
 
-    res.encoding = ENCODING
-    soup = bs4(res.text, 'lxml')
+    soup = get_soup_from_url(SEARCH_URL, 'POST', payload)
     race_id_list = make_race_id_from_soup(soup)
 
     return race_id_list
@@ -69,8 +69,7 @@ def make_race_info(race_id):
     netkeibaからrace_idを元にhtmlを取得し、必要なレース情報を抽出して返却する。
     """
     url = f'https://db.netkeiba.com/race/{race_id}/'
-    res = requests.get(url)
-    soup = bs4(res.content, 'lxml')
+    soup = get_soup_from_url(url, 'GET', None)
 
     serch_text = re.compile('.*天候.*')
     element = soup.find(text=serch_text)
@@ -105,8 +104,7 @@ def make_race_horse_map_info(race_id):
     netkeibaからrace_idを元にhtmlを取得し、必要な出走馬の情報を抽出して返却する。
     """
     url = f'https://db.netkeiba.com/race/{race_id}/'
-    res = requests.get(url)
-    soup = bs4(res.content, 'lxml')
+    soup = get_soup_from_url(url, 'GET', None)
 
     race_horse_map_list = []
     if soup.find('div', class_='Premium_Regist_Box'):
@@ -155,6 +153,24 @@ def to_date(s):
     返還後：YYYY-MM-DD
     """
     return trim(s).replace('年','-').replace('月','-').replace('日','')
+
+
+def get_soup_from_url(url, method, payload):
+    """
+    urlへリクエストを送りレスポンスをparseして返却する。
+    """
+    # サーバー負荷軽減のため指定秒数待機する
+    time.sleep(WAIT_SECOND)
+
+    res = None
+    if method == 'GET':
+        res = requests.get(url)
+    elif method == 'POST':
+        res = requests.post(url, data=payload)
+        res.encoding = ENCODING
+
+    soup = bs4(res.content, 'lxml')
+    return soup
 
 
 if __name__ == "__main__":
