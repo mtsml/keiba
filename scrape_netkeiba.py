@@ -148,7 +148,7 @@ def make_horse_info(horse_id):
 
     horse_map = {
         'horse_id' : int(horse_id),
-        'horse_name': soup.find('div', class_='horse_title').h1.string
+        'horse_name': soup.find('div', class_='horse_title').h1.string.strip()
     }
 
     horse_column_map = {          
