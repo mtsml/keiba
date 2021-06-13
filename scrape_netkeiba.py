@@ -130,7 +130,7 @@ def make_race_horse_map_info(race_id):
             'umaban'        : int(td_list[2].string),
             'wakuban'       : int(td_list[1].string),
             'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
-            'jockey_id'     : int(td_list[6].a.get('href').replace('/jockey/', '').replace('/', '')),
+            'jockey_id'     : td_list[6].a.get('href').replace('/jockey/', '').replace('/', ''),
             'jockey_weight' : float(td_list[5].string) if td_list[5].string != None else 'NULL',
             'race_time'     : td_list[7].string if td_list[7].string != None else 'NULL',
             'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
@@ -141,6 +141,7 @@ def make_race_horse_map_info(race_id):
         race_horse_map_list.append(race_horse_map)
     
     return race_horse_map_list
+
 
 def make_horse_info(horse_id):
     url = f'https://db.netkeiba.com/horse/{horse_id}/'
@@ -186,8 +187,6 @@ def make_horse_info(horse_id):
             horse_map[horse_column_map[th]['key']] = horse_column_map[th]['val'](td)
     
     return horse_map
-
-
 
 
 def trim(s):
