@@ -13,14 +13,15 @@ ENCODING = 'EUC-JP'
 WAIT_SECOND = 1
 
 
-def main(word):
-    race_id_list = get_race_id_list(word)
+def main(word, year):
+    race_id_list = get_race_id_list(word, year)
     print('len: ', len(race_id_list))
 
     db = Db()
     for race_id in race_id_list:
         print('race_id: ', race_id)
-        db.delete_race(race_id)
+        # 手作業で削除するためコメントアウト
+        # db.delete_race(race_id)
 
         race_info = make_race_info(race_id)
         race_horse_map_info = make_race_horse_map_info(race_id)
@@ -39,8 +40,10 @@ def main(word):
                 if len(past_race_id_list) > 0:
                     print('  past_race_id_list: ', past_race_id_list)
                     for past_race_id in past_race_id_list:
-                        past_race_info = make_race_info(race_id)
-                        past_race_horse_map_info = make_race_horse_map_info(race_id)
+                        # race_idのデータはすでに追加済みのためスキップ
+                        if race_id == past_race_id: continue
+                        past_race_info = make_race_info(past_race_id)
+                        past_race_horse_map_info = make_race_horse_map_info(past_race_id)
                         print('    past_race_info: ', past_race_info)
                         print('    past_race_horse_map_info: ', past_race_horse_map_info)
                         db.insert_race(past_race_info)
@@ -51,7 +54,7 @@ def main(word):
         print('------------------------------------------')
 
 
-def get_race_id_list(race_name):
+def get_race_id_list(race_name, year):
     """
     race_nameにレース名が部分一致するすべてレースIDを取得する。
     """
@@ -59,6 +62,8 @@ def get_race_id_list(race_name):
     payload = {
         'pid': 'race_list',
         'list': '100',
+        'start_year': year,
+        'end_year': year,
         'word': word
     }
 
@@ -252,5 +257,6 @@ def get_soup_from_url(url, method, payload):
 
 
 if __name__ == "__main__":
-    word = input('検索ワードを入力してください>')
-    main(word)
+    word = input('検索ワードを入力してください >')
+    year = input('年度を入力してください      >')
+    main(word, year)
