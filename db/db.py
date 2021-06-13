@@ -48,3 +48,13 @@ class Db:
             with conn.cursor() as cur:
                 cur.execute(sql)
             conn.commit()
+    
+    def insert_horse(self, horse_info):
+        """
+        レース情報をhorseテーブルに格納する。
+        """
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO horse(horse_id, birthday, trainer_id, owner_id, breeder_id, birthplace, selling_price) VALUES(%s, %s, %s, %s, %s, %s, %s) ON CONFLICT (horse_id) DO NOTHING",
+                   (horse_info['horse_id'], horse_info['birthday'], horse_info['trainer_id'], horse_info['owner_id'], horse_info['breeder_id'], horse_info['birthplace'], horse_info['selling_price']))
+            conn.commit()

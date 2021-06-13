@@ -27,6 +27,10 @@ def main(word):
         db.insert_race(race_info)
         if len(race_horse_map_info) > 0:
             db.insert_race_horse_map(race_horse_map_info)
+            for i in race_horse_map_info:
+                horse_info = make_horse_info(i['horse_id'])
+                print(horse_info)
+                db.insert_horse(horse_info)
         print('------------------------------------------')
 
 
@@ -136,6 +140,52 @@ def make_race_horse_map_info(race_id):
         race_horse_map_list.append(race_horse_map)
     
     return race_horse_map_list
+
+def make_horse_info(horse_id):
+    url = f'https://db.netkeiba.com/horse/{horse_id}/'
+    soup = get_soup_from_url(url, 'GET', None)
+
+    horse_map = {
+        'horse_id' : int(horse_id)
+    }
+
+    horse_column_map = {          
+        '生年月日' :  {
+            'key' : 'birthday',
+            'val' : lambda td : to_date(td.string)
+        },
+        '調教師' : {
+            'key' : 'trainer_id',
+            'val' : lambda td : td.a.get('href').replace('/trainer/', '').replace('/', '')
+        },
+        '馬主' : {
+            'key' : 'owner_id',
+            'val' : lambda td : td.a.get('href').replace('/owner/', '').replace('/', '')
+        },
+        '生産者' : {
+            'key' : 'breeder_id',
+            'val' : lambda td : td.a.get('href').replace('/breeder/', '').replace('/', '')
+        },
+        '産地' : {
+            'key' : 'birthplace',
+            'val' : lambda td : td.string
+        },
+        'セリ取引価格' : {
+            'key' : 'selling_price',
+            'val' : lambda td : int(re.sub('[^0-9]*', '', td.get_text('/').split('/')[0])) * 10000 if td.string != '\n-\n' else None
+        }
+    }
+
+    tr_list = soup.find('table', class_='db_prof_table').find_all('tr')
+    for tr in tr_list:
+        th = tr.find('th').string
+        td = tr.find('td')
+        if th in horse_column_map.keys():
+            horse_map[horse_column_map[th]['key']] = horse_column_map[th]['val'](td)
+    
+    return horse_map
+
+
 
 
 def trim(s):
