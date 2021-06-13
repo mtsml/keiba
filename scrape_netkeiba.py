@@ -20,6 +20,7 @@ def main(word):
     db = Db()
     for race_id in race_id_list:
         print('race_id: ', race_id)
+        db.delete_race(race_id)
         race_info = make_race_info(race_id)
         race_horse_map_info = make_race_horse_map_info(race_id)
         print('race_info: ', race_info)
@@ -146,7 +147,8 @@ def make_horse_info(horse_id):
     soup = get_soup_from_url(url, 'GET', None)
 
     horse_map = {
-        'horse_id' : int(horse_id)
+        'horse_id' : int(horse_id),
+        'horse_name': soup.find('div', class_='horse_title').h1.string
     }
 
     horse_column_map = {          

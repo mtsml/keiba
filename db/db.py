@@ -17,9 +17,18 @@ class Db:
 
     def backup(self, table_name):
         """
-        対象のレーブルのバックアップを取得する。
+        対象のテーブルのバックアップを取得する。
         """
         # TODO: 実装する
+
+    def delete_race(self, race_id):
+        """
+        race_idに関連するテーブルをすべて空にする。
+        """
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute('DELETE FROM race_horse_map WHERE race_id = %s; DELETE FROM race WHERE race_id = %s; DELETE FROM horse WHERE EXISTS (SELECT 1 FROM race_horse_map WHERE horse_id = horse.horse_id AND race_id = %s);', (race_id, race_id, race_id))
+            conn.commit()
 
     def insert_race(self, race_info):
         """
