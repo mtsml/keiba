@@ -96,6 +96,7 @@ def make_race_info(race_id):
     url = f'https://db.netkeiba.com/race/{race_id}/'
     soup = get_soup_from_url(url, 'GET', None)
 
+    race_name = soup.find('dl', class_='racedata').dd.h1.text.strip()
     serch_text = re.compile('.*天候.*')
     element = soup.find(text=serch_text)
     race_info = (element.string).split('\xa0/\xa0')[:3]
@@ -112,6 +113,7 @@ def make_race_info(race_id):
 
     race_info = {
         'race_id': int(race_id),
+        'race_name': race_name,
         'race_date': race_date,
         'weather': weather,
         'distance': int(distance),

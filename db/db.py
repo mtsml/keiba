@@ -36,8 +36,8 @@ class Db:
         """
         with self.get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute('INSERT INTO race(race_id, race_date, weather, distance, racecourse, race_condition, track_type, track_condition, mawari) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)  ON CONFLICT (race_id) DO NOTHING',
-                   (race_info['race_id'], race_info['race_date'], race_info['weather'], race_info['distance'], race_info['racecourse'], race_info['race_condition'], race_info['track_type'], race_info['track_condition'], race_info['mawari']))
+                cur.execute('INSERT INTO race(race_id, race_name, race_date, weather, distance, racecourse, race_condition, track_type, track_condition, mawari) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)  ON CONFLICT (race_id) DO NOTHING',
+                   (race_info['race_id'], race_info['race_name'], race_info['race_date'], race_info['weather'], race_info['distance'], race_info['racecourse'], race_info['race_condition'], race_info['track_type'], race_info['track_condition'], race_info['mawari']))
             conn.commit()
 
     def insert_race_horse_map(self, race_horse_map_list):
