@@ -122,15 +122,19 @@ def make_race_horse_map_info(race_id):
         race_horse_map = {
             'race_id'       : int(race_id),
             'horse_id'      : int(td_list[3].a.get('href').replace('/horse/', '').replace('/', '')),
+            'sex'           : td_list[4].string[0],
+            'age'           : int(td_list[4].string[1]),
             'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
             'umaban'        : int(td_list[2].string),
             'wakuban'       : int(td_list[1].string),
             'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
             'jockey_id'     : int(td_list[6].a.get('href').replace('/jockey/', '').replace('/', '')),
+            'jockey_weight' : int(td_list[5].string) if td_list[5].string != None else 'NULL',
             'race_time'     : td_list[7].string if td_list[7].string != None else 'NULL',
             'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
             'agari'         : float(td_list[11].string) if td_list[11].string != None else 'NULL',
-            'passing_order' : td_list[10].string
+            'passing_order' : td_list[10].string,
+            'prize'         : int(re.sub('\..*$', '', td_list[20].string).replace(',', ''))*10000 if td_list[20].string != None else 'NULL'
         }
         race_horse_map_list.append(race_horse_map)
     

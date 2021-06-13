@@ -15,6 +15,12 @@ class Db:
         """
         return psycopg2.connect(self.database_url)
 
+    def backup(self, table_name):
+        """
+        対象のレーブルのバックアップを取得する。
+        """
+        # TODO: 実装する
+
     def insert_race(self, race_info):
         """
         レース情報をraceテーブルに格納する。
@@ -30,13 +36,13 @@ class Db:
         出走馬の情報をrace_horse_mapテーブルに一括で格納する。
         形式：INSERT INTO race_horse_map VALUES(),(),();
         """
-        sql = 'INSERT INTO public.race_horse_map(race_id, horse_id, odds, umaban, wakuban, chakujun, jockey_id, race_time, weight, agari, passing_order) VALUES '
+        sql = 'INSERT INTO public.race_horse_map(race_id, horse_id, sex, age, odds, umaban, wakuban, chakujun, jockey_id, jockey_weight, race_time, weight, agari, passing_order, prize) VALUES '
         for index, race_horse_map in enumerate(race_horse_map_list):
             if index != 0:
                 sql += ','
             # race_timeは文字列のためNULLでない場合は「'」を付与する
             race_time_tmp = "'" if race_horse_map['race_time'] != 'NULL' else ''
-            sql += f"({race_horse_map['race_id']}, {race_horse_map['horse_id']}, {race_horse_map['odds']}, {race_horse_map['umaban']}, {race_horse_map['wakuban']}, {race_horse_map['chakujun']}, {race_horse_map['jockey_id']}, {race_time_tmp}{race_horse_map['race_time']}{race_time_tmp}, {race_horse_map['weight']}, {race_horse_map['agari']}, '{race_horse_map['passing_order']}')"
+            sql += f"({race_horse_map['race_id']}, {race_horse_map['horse_id']}, {race_horse_map['age']}, '{race_horse_map['sex']}', {race_horse_map['odds']}, {race_horse_map['umaban']}, {race_horse_map['wakuban']}, {race_horse_map['chakujun']}, {race_horse_map['jockey_id']}, {race_horse_map['jockey_weight']}, {race_time_tmp}{race_horse_map['race_time']}{race_time_tmp}, {race_horse_map['weight']}, {race_horse_map['agari']}, '{race_horse_map['passing_order']}', {race_horse_map['prize']})"
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:
