@@ -70,7 +70,7 @@ def make_race_info(race_id):
     element = soup.find('p', attrs={ 'class': 'smalltxt' })
     race_basic_info = ((element.string).split())[0:3]
     race_date = to_date(race_basic_info[0])
-    race_condition = race_basic_info[2]
+    race_condition = race_basic_info[2] if len(race_basic_info) > 2 else 'NULL'
     racecourse = re.findall('回(.*)\d+日', race_basic_info[1])[0]
 
     race_info = {
@@ -117,17 +117,17 @@ def make_race_horse_map_list(race_id):
         race_horse_map = {
             'race_id'       : race_id,
             'horse_id'      : get_id_from_href(td_list[3].a.get('href')),
-            'sex'           : td_list[4].string[0],
-            'age'           : int(td_list[4].string[1]),
+            'sex'           : td_list[4].string[0] if not isNull(td_list[4].string) else ' NULL',
+            'age'           : int(td_list[4].string[1]) if not isNull(td_list[4].string) else ' NULL',
             'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
-            'umaban'        : int(td_list[2].string),
-            'wakuban'       : int(td_list[1].string),
+            'umaban'        : int(td_list[2].string) if not isNull(td_list[2].string) else 'NULL',
+            'wakuban'       : int(td_list[1].string) if not isNull(td_list[1].string) else 'NULL',
             'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
-            'jockey_id'     : get_id_from_href(td_list[6].a.get('href')),
-            'jockey_weight' : float(td_list[5].string) if td_list[5].string != None else 'NULL',
-            'race_time'     : td_list[7].string if td_list[7].string != None else 'NULL',
+            'jockey_id'     : get_id_from_href(td_list[6].a.get('href')) if td_list[6].find('a') else 'NULL',
+            'jockey_weight' : float(td_list[5].string) if not isNull(td_list[5].string) else 'NULL',
+            'race_time'     : td_list[7].string if not isNull(td_list[7].string) else 'NULL',
             'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
-            'agari'         : float(td_list[11].string) if td_list[11].string != None else 'NULL',
+            'agari'         : float(td_list[11].string) if not isNull(td_list[11].string) else 'NULL',
             'passing_order' : td_list[10].string,
             'prize'         : int(re.sub('\..*$', '', td_list[20].string).replace(',', ''))*10000 if td_list[20].string != None else 'NULL'
         }
@@ -161,15 +161,15 @@ def make_horse_info(horse_id):
         },
         '調教師' : {
             'key' : 'trainer_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href'))
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.infd('a') else 'NULL'
         },
         '馬主' : {
             'key' : 'owner_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href'))
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.infd('a') else 'NULL'
         },
         '生産者' : {
             'key' : 'breeder_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href'))
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.infd('a') else 'NULL'
         },
         '産地' : {
             'key' : 'birthplace',
@@ -191,8 +191,8 @@ def make_horse_info(horse_id):
 
     # 血統情報を取得　
     tr_list = soup.find('table', class_='blood_table').find_all('tr')
-    horse_map['father_horse_id'] = get_id_from_href(tr_list[0].find_all('td')[0].a.get('href'))
-    horse_map['mother_horse_id'] = get_id_from_href(tr_list[2].find_all('td')[0].a.get('href'))
+    horse_map['father_horse_id'] = get_id_from_href(tr_list[0].find_all('td')[0].a.get('href')) if tr_list[0].find_all('td')[0].find('a') else 'NULL'
+    horse_map['mother_horse_id'] = get_id_from_href(tr_list[2].find_all('td')[0].a.get('href')) if tr_list[2].find_all('td')[0].find('a') else 'NULL'
 
     # 過去の出走race_idをすべて取得
     past_race_id_list = []
@@ -251,6 +251,33 @@ def get_id_from_href(href):
             .replace('/owner/', '')
             .replace('/', '')
     )
+
+def isNull(s):
+    """Nullまたは空白文字かを判定する
+
+    Args:
+        s (str): 判定対象の文字列
+
+    Returns:
+        bool: Nullまたは空白文字列の場合はTrue、それ以外はFalse
+
+    Exmaples:
+        >>> isNull(None)
+        True
+        >>> isNull('None')
+        False
+        >>> isNull('') # 空文字
+        True
+        >>> isNull(' ') # 半角空白
+        True
+        >>> isNull('　') # 全角空白
+        True
+        >>> isNull('    ') # タブ
+        True
+        >>> isNull('   None  ') # 空白を含む文字列
+        False
+    """
+    return s == None or re.search('^\s*$', s) != None
 
 
 def get_soup_from_url(url, method, payload):

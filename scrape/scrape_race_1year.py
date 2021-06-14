@@ -27,9 +27,9 @@ def main(word, year):
             db.insert_race_horse_map(race_horse_map_list)
             for i in race_horse_map_list:
                 horse_id = i['horse_id']
+                print('  horse_id: ', horse_id, i['horse_name'])
                 horse_info = make_horse_info(horse_id)
                 past_race_id_list = horse_info['past_race_id_list']
-                print('  horse_id: ', horse_info['horse_id'])
                 db.insert_horse(horse_info)
 
                 # 過去の出走データ処理
@@ -39,7 +39,7 @@ def main(word, year):
                         if race_id == past_race_id: continue
                         past_race_info = make_race_info(past_race_id)
                         past_race_horse_map_list = make_race_horse_map_list(past_race_id)
-                        print('    past_race_id: ', past_race_info['race_id'])
+                        print('    past_race_id: ', past_race_info['race_id'], past_race_info['race_name'])
                         db.insert_race(past_race_info)
                         if len(past_race_horse_map_list) > 0:
                             db.insert_race_horse_map(past_race_horse_map_list)
