@@ -116,7 +116,7 @@ def make_race_horse_map_list(race_id):
         td_list = tr.find_all('td')
         race_horse_map = {
             'race_id'       : race_id,
-            'horse_id'      : get_id_from_href(td_list[3].a.get('href')),
+            'horse_id'      : get_id_from_href(td_list[3].a.get('href')) if td_list[3].find('a') else f'no_id_{td_list[3].string}',
             'sex'           : td_list[4].string[0] if not isNull(td_list[4].string) else ' NULL',
             'age'           : int(td_list[4].string[1]) if not isNull(td_list[4].string) else ' NULL',
             'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
@@ -161,15 +161,15 @@ def make_horse_info(horse_id):
         },
         '調教師' : {
             'key' : 'trainer_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else 'NULL'
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else f'no_id_{td.string}'
         },
         '馬主' : {
             'key' : 'owner_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else 'NULL'
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else f'no_id_{td.string}'
         },
         '生産者' : {
             'key' : 'breeder_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else 'NULL'
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else f'no_id_{td.string}'
         },
         '産地' : {
             'key' : 'birthplace',
@@ -191,8 +191,8 @@ def make_horse_info(horse_id):
 
     # 血統情報を取得　
     tr_list = soup.find('table', class_='blood_table').find_all('tr')
-    horse_map['father_horse_id'] = get_id_from_href(tr_list[0].find_all('td')[0].a.get('href')) if tr_list[0].find_all('td')[0].find('a') else 'NULL'
-    horse_map['mother_horse_id'] = get_id_from_href(tr_list[2].find_all('td')[0].a.get('href')) if tr_list[2].find_all('td')[0].find('a') else 'NULL'
+    horse_map['father_horse_id'] = get_id_from_href(tr_list[0].find_all('td')[0].a.get('href')) if tr_list[0].find_all('td')[0].find('a') else f"no_id_{tr_list[0].find_all('td')[0].string}"
+    horse_map['mother_horse_id'] = get_id_from_href(tr_list[2].find_all('td')[0].a.get('href')) if tr_list[2].find_all('td')[0].find('a') else f"no_id_{tr_list[2].find_all('td')[0].string}"
 
     # 過去の出走race_idをすべて取得
     past_race_id_list = []
