@@ -219,7 +219,7 @@ def make_horse_info(horse_id):
     past_race_id_list = []
     tr_list = soup.find('table', class_='db_h_race_results').find('tbody').find_all('tr')
     for tr in tr_list:
-        past_race_id_list.append(int(tr.find_all('td')[4].a.get('href').replace('/race/', '').replace('/', '')))
+        past_race_id_list.append(tr.find_all('td')[4].a.get('href').replace('/race/', '').replace('/', ''))
 
     return horse_map, past_race_id_list
 
