@@ -5,8 +5,6 @@ import time
 import requests
 from bs4 import BeautifulSoup as bs4
 
-from ..db.db import Db
-
 
 SEARCH_URL = 'https://db.netkeiba.com/'
 ENCODING = 'EUC-JP'
@@ -34,7 +32,7 @@ def get_race_id_list(race_name, year):
 
 def make_race_id_from_soup(soup):
     """
-    soupからrace_idをすべて取り出す。
+    検索結果のsoupからrace_idをすべて取り出す。
     """
     race_id_list = []
     tr_list = soup.find('table', class_='race_table_01').find_all('tr')
@@ -43,16 +41,21 @@ def make_race_id_from_soup(soup):
         if index == 0: continue
         # classがtxt_lの要素は複数存在するがfindは最初に見つかった要素を返却するためこれでOK
         href = tr.find('td', class_='txt_l').a.get('href')
-        race_id = href.replace('/race/', '').replace('/', '')
+        race_id = get_id_from_href(href)
         race_id_list.append(race_id)
     return race_id_list
 
 
 def make_race_info(race_id):
+    """レース情報を抽出する
+
+    Args:
+        race_id (str): レースID
+
+    Returns:
+        dict[str, str]: レースの情報
     """
-    netkeibaからrace_idを元にhtmlを取得し、必要なレース情報を抽出して返却する。
-    """
-    url = f'https://db.netkeiba.com/race/{race_id}/'
+    url = f'{SEARCH_URL}race/{race_id}/'
     soup = get_soup_from_url(url, 'GET', None)
 
     race_name = soup.find('dl', class_='racedata').dd.h1.text.strip()
@@ -85,11 +88,19 @@ def make_race_info(race_id):
     return race_info
 
 
-def make_race_horse_map_info(race_id):
+def make_race_horse_map_list(race_id):
+    """レースの結果を抽出する
+
+    Args:
+        race_id (str): 
+
+    Returns:
+        list[dict[str, dict]]: 出走馬の情報リスト
+    
+    Note:
+        プレミアム会員登録しないと閲覧できない場合は空のリストを返却する。
     """
-    netkeibaからrace_idを元にhtmlを取得し、必要な出走馬の情報を抽出して返却する。
-    """
-    url = f'https://db.netkeiba.com/race/{race_id}/'
+    url = f'{SEARCH_URL}race/{race_id}/'
     soup = get_soup_from_url(url, 'GET', None)
 
     race_horse_map_list = []
@@ -105,14 +116,14 @@ def make_race_horse_map_info(race_id):
         td_list = tr.find_all('td')
         race_horse_map = {
             'race_id'       : race_id,
-            'horse_id'      : td_list[3].a.get('href').replace('/horse/', '').replace('/', ''),
+            'horse_id'      : get_id_from_href(td_list[3].a.get('href')),
             'sex'           : td_list[4].string[0],
             'age'           : int(td_list[4].string[1]),
             'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
             'umaban'        : int(td_list[2].string),
             'wakuban'       : int(td_list[1].string),
             'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
-            'jockey_id'     : td_list[6].a.get('href').replace('/jockey/', '').replace('/', ''),
+            'jockey_id'     : get_id_from_href(td_list[6].a.get('href')),
             'jockey_weight' : float(td_list[5].string) if td_list[5].string != None else 'NULL',
             'race_time'     : td_list[7].string if td_list[7].string != None else 'NULL',
             'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
@@ -126,7 +137,15 @@ def make_race_horse_map_info(race_id):
 
 
 def make_horse_info(horse_id):
-    url = f'https://db.netkeiba.com/horse/{horse_id}/'
+    """馬の情報を抽出する
+
+    Args:
+        horse_id (str): 馬のID
+
+    Returns:
+        dict[str, str]: 馬の情報
+    """
+    url = f'{SEARCH_URL}horse/{horse_id}/'
     soup = get_soup_from_url(url, 'GET', None)
 
     horse_map = {
@@ -134,6 +153,7 @@ def make_horse_info(horse_id):
         'horse_name': soup.find('div', class_='horse_title').h1.string.strip()
     }
 
+    # thのヘッダー名とDBのカラム、値変換処理の組み合わせ
     horse_column_map = {          
         '生年月日' :  {
             'key' : 'birthday',
@@ -141,15 +161,15 @@ def make_horse_info(horse_id):
         },
         '調教師' : {
             'key' : 'trainer_id',
-            'val' : lambda td : td.a.get('href').replace('/trainer/', '').replace('/', '')
+            'val' : lambda td : get_id_from_href(td.a.get('href'))
         },
         '馬主' : {
             'key' : 'owner_id',
-            'val' : lambda td : td.a.get('href').replace('/owner/', '').replace('/', '')
+            'val' : lambda td : get_id_from_href(td.a.get('href'))
         },
         '生産者' : {
             'key' : 'breeder_id',
-            'val' : lambda td : td.a.get('href').replace('/breeder/', '').replace('/', '')
+            'val' : lambda td : get_id_from_href(td.a.get('href'))
         },
         '産地' : {
             'key' : 'birthplace',
@@ -171,53 +191,81 @@ def make_horse_info(horse_id):
 
     # 血統情報を取得　
     tr_list = soup.find('table', class_='blood_table').find_all('tr')
-    horse_map['father_horse_id'] = tr_list[0].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', '')
-    horse_map['mother_horse_id'] = tr_list[2].find_all('td')[0].a.get('href').replace('/horse/ped/', '').replace('/', '')
+    horse_map['father_horse_id'] = get_id_from_href(tr_list[0].find_all('td')[0].a.get('href'))
+    horse_map['mother_horse_id'] = get_id_from_href(tr_list[2].find_all('td')[0].a.get('href'))
 
     # 過去の出走race_idをすべて取得
     past_race_id_list = []
     tr_list = soup.find('table', class_='db_h_race_results').find('tbody').find_all('tr')
     for tr in tr_list:
-        past_race_id_list.append(tr.find_all('td')[4].a.get('href').replace('/race/', '').replace('/', ''))
+        past_race_id_list.append(get_id_from_href(tr.find_all('td')[4].a.get('href')))
+    horse_map['past_race_id_list'] = past_race_id_list
 
-    return horse_map, past_race_id_list
+    return horse_map
 
 
 def trim(s):
-    """
-    文字列の前後の空白を削除する。
+    """文字列の前後の空白を削除する
+
+    Args:
+        s (str): 対象の文字列
+
+    Returns:
+        str: 前後の空白が削除された文字列
     """
     return str(s).strip()
 
 
 def to_date(s):
-    """
-    日本語表記の日付をISOの拡張形式に変換する。
-    変換前：YYYY年MM月DD日
-    返還後：YYYY-MM-DD
+    """日本語表記の日付をISOの拡張形式に変換する
+
+    Args:
+        s (str): 日付（YYYY年MM月DD日）
+
+    Returns:
+        str: 日付（YYYY-MM-DD）
     """
     return trim(s).replace('年','-').replace('月','-').replace('日','')
 
 
-def get_id_from_url(url):
-    """
-    urlの中に含まれるIDを取り出す。
+def get_id_from_href(href):
+    """hrefからIDを取り出す
+
+    Args:
+        href (str): htmlのhref属性の値
+
+    Returns:
+        str: hrefに含まれるID
+
+    Examples:
+        >>> get_id_from_href('/horse/01234567/')
+        '01234567'
     """
     # IDの規則性が不明であるため正規表現は使わない
     return (
-        url.replace('/horse/ped/', '')
-           .replace('/horse/', '')
-           .replace('/race/', '')
-           .replace('/breeder/', '')
-           .replace('/trainer/', '')
-           .replace('/owner/', '')
-           .replace('/', '')
+        href.replace('/horse/ped/', '')
+            .replace('/horse/', '')
+            .replace('/race/', '')
+            .replace('/breeder/', '')
+            .replace('/trainer/', '')
+            .replace('/owner/', '')
+            .replace('/', '')
     )
 
 
 def get_soup_from_url(url, method, payload):
-    """
-    urlへリクエストを送りレスポンスをparseして返却する。
+    """urlへリクエストを送りレスポンスをsoupして返却する
+
+    Args:
+        url (str): URL
+        method (str): GET or POST
+        payload (:obj:dict[str, str], obtional): POST時に送信するpayload
+
+    Returns:
+        BeautifulSoup: レスポンスのHTMLのsoup
+    
+    TODO:
+        * soupの型を調べる
     """
     # サーバー負荷軽減のため指定秒数待機する
     time.sleep(WAIT_SECOND)
