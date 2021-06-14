@@ -21,14 +21,16 @@ def main(word, year):
     for race_id in race_id_list:
         print('race_id: ', race_id)
         race_info = make_race_info(race_id)
+        print('race_name: ', race_info['race_name'])
         race_horse_map_list = make_race_horse_map_list(race_id)
         db.insert_race(race_info)
         if len(race_horse_map_list) > 0:
             db.insert_race_horse_map(race_horse_map_list)
             for i in race_horse_map_list:
                 horse_id = i['horse_id']
-                print('  horse_id: ', horse_id, i['horse_name'])
+                print('  horse_id: ', horse_id)
                 horse_info = make_horse_info(horse_id)
+                print('  horse_name: ', horse_info['horse_name'])
                 past_race_id_list = horse_info['past_race_id_list']
                 db.insert_horse(horse_info)
 
@@ -37,9 +39,10 @@ def main(word, year):
                     for past_race_id in past_race_id_list:
                         # race_idのデータはすでに追加済みのためスキップ
                         if race_id == past_race_id: continue
+                        print('    past_race_id: ', past_race_id)
                         past_race_info = make_race_info(past_race_id)
                         past_race_horse_map_list = make_race_horse_map_list(past_race_id)
-                        print('    past_race_id: ', past_race_info['race_id'], past_race_info['race_name'])
+                        print('    past_race_name: ', past_race_info['race_name'])
                         db.insert_race(past_race_info)
                         if len(past_race_horse_map_list) > 0:
                             db.insert_race_horse_map(past_race_horse_map_list)
