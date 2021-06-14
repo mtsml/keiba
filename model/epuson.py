@@ -4,7 +4,7 @@ import optuna.integration.lightgbm as lgb
 from sklearn.model_selection import train_test_split
 import lightgbm
 
-from db.db import Db
+from ..db.db import Db
 
 
 db = Db()

@@ -5,7 +5,7 @@ import time
 import requests
 from bs4 import BeautifulSoup as bs4
 
-from db.db import Db
+from ..db.db import Db
 
 
 SEARCH_URL = 'https://db.netkeiba.com/'
