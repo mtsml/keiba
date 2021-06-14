@@ -161,15 +161,15 @@ def make_horse_info(horse_id):
         },
         '調教師' : {
             'key' : 'trainer_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.infd('a') else 'NULL'
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else 'NULL'
         },
         '馬主' : {
             'key' : 'owner_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.infd('a') else 'NULL'
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else 'NULL'
         },
         '生産者' : {
             'key' : 'breeder_id',
-            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.infd('a') else 'NULL'
+            'val' : lambda td : get_id_from_href(td.a.get('href')) if td.find('a') else 'NULL'
         },
         '産地' : {
             'key' : 'birthplace',
