@@ -1,5 +1,5 @@
 CREATE TABLE race_horse_map (
-    race_id         BIGINT,
+    race_id         VARCHAR,
     horse_id        VARCHAR,
     sex             VARCHAR,
     age             INTEGER,

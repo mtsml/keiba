@@ -112,7 +112,7 @@ def make_race_info(race_id):
     racecourse = re.findall('回(.*)\d+日', race_basic_info[1])[0]
 
     race_info = {
-        'race_id': int(race_id),
+        'race_id': race_id,
         'race_name': race_name,
         'race_date': race_date,
         'weather': weather,
@@ -145,7 +145,7 @@ def make_race_horse_map_info(race_id):
 
         td_list = tr.find_all('td')
         race_horse_map = {
-            'race_id'       : int(race_id),
+            'race_id'       : race_id,
             'horse_id'      : td_list[3].a.get('href').replace('/horse/', '').replace('/', ''),
             'sex'           : td_list[4].string[0],
             'age'           : int(td_list[4].string[1]),
