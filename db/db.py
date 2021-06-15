@@ -67,3 +67,16 @@ class Db:
                 cur.execute("INSERT INTO horse(horse_id, horse_name, birthday, trainer_id, owner_id, breeder_id, birthplace, selling_price, father_horse_id, mother_horse_id) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (horse_id) DO NOTHING",
                    (horse_info['horse_id'], horse_info['horse_name'], horse_info['birthday'], horse_info['trainer_id'], horse_info['owner_id'], horse_info['breeder_id'], horse_info['birthplace'], horse_info['selling_price'], horse_info['father_horse_id'], horse_info['mother_horse_id']))
             conn.commit()
+
+    def count_race_horse_map(self, horse_id):
+        """過去のレース情報をカウントする
+
+        Args:
+            horse_id (str): 馬のID
+        """
+        cnt = None
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 cnt FROM race_horse_map WHERE horse_id = %s", (horse_id,))
+                cnt = cur.rowcount
+        return cnt
