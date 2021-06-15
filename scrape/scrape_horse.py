@@ -7,7 +7,7 @@ from db.db import Db
 from scrape.util import *
 
 
-def main(horse_id, doSkip):
+def main(horse_id):
     """馬の情報と過去の出走レース情報を登録する
 
     Args:
@@ -24,7 +24,7 @@ def main(horse_id, doSkip):
 
         # 過去の出走データ処理
         if len(past_race_id_list) > 0:
-            if doSkip == 'Y' and db.count_race_horse_map(horse_id) == len(past_race_id_list):
+            if db.count_race_horse_map(horse_id) == len(past_race_id_list):
                 print('過去レース登録済みのため終了')
                 return
             for past_race_id in past_race_id_list:
@@ -47,5 +47,4 @@ def main(horse_id, doSkip):
 
 if __name__ == "__main__":
     horse_id = input('馬のIDを入力してください >')
-    do_skip = input('過去レースが登録済みの場合に処理を終了する場合は「Y」を入力してください。終了しない場合はそれ以外の文字を。 >')
-    main(horse_id, do_skip)
+    main(horse_id)
