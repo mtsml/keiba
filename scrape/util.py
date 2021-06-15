@@ -119,7 +119,7 @@ def make_race_horse_map_list(race_id):
             'horse_id'      : get_id_from_href(td_list[3].a.get('href')) if td_list[3].find('a') else f'no_id_{td_list[3].string}',
             'sex'           : td_list[4].string[0] if not isNull(td_list[4].string) else ' NULL',
             'age'           : int(td_list[4].string[1]) if not isNull(td_list[4].string) else ' NULL',
-            'odds'          : float(td_list[12].string) if td_list[12].string != '---' else 'NULL',
+            'odds'          : float(td_list[12].string.replace(',', '')) if td_list[12].string != '---' and td_list[12].string != None else 'NULL',
             'umaban'        : int(td_list[2].string) if not isNull(td_list[2].string) else 'NULL',
             'wakuban'       : int(td_list[1].string) if not isNull(td_list[1].string) else 'NULL',
             'chakujun'      : int(td_list[0].string) if re.search('^[0-9]+$' ,td_list[0].string) else 'NULL',
