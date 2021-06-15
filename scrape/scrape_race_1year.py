@@ -41,6 +41,10 @@ def main(word, year):
 
                         # 過去の出走データ処理
                         if len(past_race_id_list) > 0:
+                            # 過去の出走データが全て登録済みの場合はスキップ
+                            if db.count_race_horse_map(horse_id) == len(past_race_id_list):
+                                print('  過去レース登録済みのためスキップ')
+                                continue
                             for past_race_id in past_race_id_list:
                                 # race_idのデータはすでに追加済みのためスキップ
                                 if race_id == past_race_id: continue
@@ -53,11 +57,11 @@ def main(word, year):
                                     db.insert_race_horse_map(past_race_horse_map_list)
                                     # これ以上進む場合は再帰に置き換えること
                     except:
-                        traceback.format_exc()
+                        print(traceback.format_exc())
                         error_horse_id_list.append(horse_id)
                         pass
         except:
-            traceback.format_exc()
+            print(traceback.format_exc())
             error_race_id_list.append(race_id)
             pass
         finally:
