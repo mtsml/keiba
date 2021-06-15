@@ -59,12 +59,12 @@ def make_race_info(race_id):
     soup = get_soup_from_url(url, 'GET', None)
 
     race_name = soup.find('dl', class_='racedata').dd.h1.text.strip()
-    serch_text = re.compile('.*天候.*')
-    element = soup.find(text=serch_text)
+    # serch_text = re.compile('.*天候.*')
+    element = soup.find('dl', class_='racedata').dd.p.diary_snap_cut.span
     race_info = (element.string).split('\xa0/\xa0')[:3]
     mawari = (race_info[0])[1:2]
     distance = re.sub('[^0-9]+', '', race_info[0]) # 数字以外を削除
-    weather = (race_info[1])[5:]
+    weather = (race_info[1])[5:] if not isNull(race_info[1]) else 'NULL'
     track_type, track_condition = map(trim, race_info[2].split(':')) if re.search('芝.*ダート', race_info[2]) == None else [race_info[0][0], race_info[2]]
 
     element = soup.find('p', attrs={ 'class': 'smalltxt' })
