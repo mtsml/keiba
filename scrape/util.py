@@ -125,7 +125,7 @@ def make_race_horse_map_list(race_id):
             'chakujun'      : int(td_list[0].string) if not isNull(td_list[0].string) and re.search('^[0-9]+$' ,td_list[0].string) != None else 'NULL',
             'jockey_id'     : get_id_from_href(td_list[6].a.get('href')) if td_list[6].find('a') else 'NULL',
             'jockey_weight' : float(td_list[5].string) if not isNull(td_list[5].string) else 'NULL',
-            'race_time'     : td_list[7].string if not isNull(td_list[7].string) else 'NULL',
+            'race_time'     : to_time(td_list[7].string) if not isNull(td_list[7].string) else 'NULL',
             'weight'        : int(re.sub('\(.*\)', '', td_list[14].string)) if re.sub('\(.*\)', '', td_list[14].string) != '計不' else 'NULL',
             'agari'         : float(td_list[11].string) if not isNull(td_list[11].string) else 'NULL',
             'passing_order' : td_list[10].string if td_list[10].string != None else 'NULL',
@@ -252,6 +252,7 @@ def get_id_from_href(href):
             .replace('/', '')
     )
 
+
 def isNull(s):
     """Nullまたは空白文字かを判定する
 
@@ -306,3 +307,25 @@ def get_soup_from_url(url, method, payload):
 
     soup = bs4(res.content, 'lxml')
     return soup
+
+
+def to_time(s):
+    """time形式に変換する
+
+    Args:
+        s (str): 対象の文字列　
+
+    Returns:
+        str: mm:ss.ff
+
+    Examples:
+        >>> to_time('1.08.7')
+        '1:08.7'
+        >>> to_time('2:00.12')
+        '2:00.12' # 元からtime形式の場合はそのまま返却
+    """
+    s_date = s
+    if re.search('\d+\.\d+\.\d', s) != None:
+        idx = s.find('.')
+        s_date = s[:idx] + ':' + s[idx+1:]
+    return s_date
