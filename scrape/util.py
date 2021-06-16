@@ -65,7 +65,7 @@ def make_race_info(race_id):
     mawari = (race_info[0])[1:2]
     distance = re.sub('[^0-9]+', '', race_info[0]) # 数字以外を削除
     weather = (race_info[1])[5:] if not isNull(race_info[1]) else 'NULL'
-    track_type, track_condition = map(trim, race_info[2].split(':')) if re.search('芝.*ダート', race_info[2]) == None else [race_info[0][0], race_info[2]]
+    track_type, track_condition = map(trim, race_info[2].split(':')) if re.search('芝.*ダート', race_info[2]) == None and trim(race_info[2]) != '' else [race_info[0][0], trim(race_info[2])]
 
     element = soup.find('p', attrs={ 'class': 'smalltxt' })
     race_basic_info = (element.string).split()
