@@ -12,8 +12,17 @@ WAIT_SECOND = 1
 
 
 def get_race_id_list(race_name, year):
-    """
-    race_nameにレース名が部分一致するすべてレースIDを取得する。
+    """race_nameにレース名が部分一致するyear年のレースID一覧を取得する
+
+    Args:
+        race_name (str): 検索するレースの名称
+        year (int): 検索する年
+
+    Returns:
+        list[str]: レースIDの一覧
+    
+    Note:
+        yearを検索条件に用いるためlistといいつつ1件しか取得されない場合がほとんど。
     """
     word = urllib.parse.quote(race_name, encoding=ENCODING)
     payload = {
@@ -31,8 +40,13 @@ def get_race_id_list(race_name, year):
 
 
 def make_race_id_from_soup(soup):
-    """
-    検索結果のsoupからrace_idをすべて取り出す。
+    """検索結果のsoupからrace_idをすべて取り出す
+
+    Args:
+        soup (BeautifulSoup): レースの詳細検索結果ページのsoup
+
+    Returns:
+        list[str]: レースIDの一覧
     """
     race_id_list = []
     tr_list = soup.find('table', class_='race_table_01').find_all('tr')
