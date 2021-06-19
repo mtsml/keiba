@@ -259,6 +259,7 @@ def get_id_from_href(href):
     return (
         href.replace('/horse/ped/', '')
             .replace('/horse/', '')
+            .replace('/jockey/', '')
             .replace('/race/', '')
             .replace('/breeder/', '')
             .replace('/trainer/', '')
