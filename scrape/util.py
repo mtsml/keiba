@@ -11,6 +11,23 @@ ENCODING = 'EUC-JP'
 WAIT_SECOND = 1
 
 
+def get_race_id_list_v2(param):
+    """paramの条件に一致するレースID一覧を取得する
+
+    Args:
+        param (dict[str, str]): 検索param
+
+    Returns:
+        list[str]: レースIDの一覧
+    
+    """
+    soup = get_soup_from_url(SEARCH_URL, 'POST', param)
+    race_id_list = make_race_id_from_soup(soup)
+
+    return race_id_list
+
+
+
 def get_race_id_list(race_name, year):
     """race_nameにレース名が部分一致するyear年のレースID一覧を取得する
 
