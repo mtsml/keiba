@@ -24,7 +24,7 @@ def main(horse_id):
 
         # 過去の出走データ処理
         if len(past_race_id_list) > 0:
-            if db.count_race_horse_map(horse_id) == len(past_race_id_list):
+            if db.count_race_horse_map(horse_id) == len(past_race_id_list) and False:
                 print('過去レース登録済みのため終了')
                 return
             for past_race_id in past_race_id_list:

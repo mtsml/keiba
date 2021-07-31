@@ -29,6 +29,8 @@ def sub(race_id):
     for index, tr in enumerate(tr_list):
         # リストの先頭はヘッダーのため処理しない
         if index in (0,1): continue
+        # 取り消しの馬は除く
+        if 'Cancel' in tr['class']: continue
         td_list = tr.find_all('td')
         race_horse_map = {
             'race_id'       : race_id,
